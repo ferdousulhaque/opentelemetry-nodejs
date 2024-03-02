@@ -86,11 +86,11 @@ const server = app.listen(port, () => {
 const gracefulShutdown = () => {
   server.close(() => {
     console.log("Server stopped");
-    sdk
-      .shutdown()
-      .then(() => console.log("Tracing terminated"))
-      .catch((error) => console.error("Error shutting down tracing", error))
-      .finally(() => process.exit(0));
+    // sdk
+    //   .shutdown()
+    //   .then(() => console.log("Tracing terminated"))
+    //   .catch((error) => console.error("Error shutting down tracing", error))
+    //   .finally(() => process.exit(0));
   });
 };
 
