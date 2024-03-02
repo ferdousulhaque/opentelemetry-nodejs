@@ -15,7 +15,7 @@ const {
 const traceExporter = new JaegerExporter({
   // Jaeger agent UDP Thrift endpoint
   endpoint: "http://localhost:14268/api/traces",
-  serviceName: "app-one", // Replace with your service name
+  serviceName: "node-mongo-redis", // Replace with your service name
 });
 
 const sdk = new NodeSDK({
