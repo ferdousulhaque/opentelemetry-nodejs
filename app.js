@@ -7,6 +7,8 @@ const app = express();
 const port = process.env.PORT;
 const eventsServiceProvider = require("./eventsServiceProvider");
 
+require("./auto")
+
 // Tracer Middleware Inject
 // const { trace, context, propagation } = require("@opentelemetry/api");
 // const tracerProvider = configureOpenTelemetry("node-mongo-redis");
@@ -84,11 +86,11 @@ const server = app.listen(port, () => {
 const gracefulShutdown = () => {
   server.close(() => {
     console.log("Server stopped");
-    // sdk
-    //   .shutdown()
-    //   .then(() => console.log("Tracing terminated"))
-    //   .catch((error) => console.error("Error shutting down tracing", error))
-    //   .finally(() => process.exit(0));
+    sdk
+      .shutdown()
+      .then(() => console.log("Tracing terminated"))
+      .catch((error) => console.error("Error shutting down tracing", error))
+      .finally(() => process.exit(0));
   });
 };
 
