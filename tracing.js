@@ -1,4 +1,4 @@
-const { NodeTracerProvider } = require("@opentelemetry/node");
+const { NodeTracerProvider } = require("@opentelemetry/sdk-trace-node");
 const { registerInstrumentations } = require("@opentelemetry/instrumentation");
 const {
   ExpressInstrumentation,
@@ -9,9 +9,18 @@ const { Resource } = require("@opentelemetry/resources");
 const {
   SemanticResourceAttributes,
 } = require("@opentelemetry/semantic-conventions");
+
+// Redis Instrumentation
 const {
   RedisInstrumentation,
 } = require("@opentelemetry/instrumentation-redis");
+
+// MongoDB Instrumentation
+const {
+  MongoDBInstrumentation,
+} = require("@opentelemetry/instrumentation-mongodb");
+
+
 function configureOpenTelemetry(serviceName) {
   // Create a tracer provider and register the Express instrumentation
   const provider = new NodeTracerProvider({
@@ -39,6 +48,7 @@ function configureOpenTelemetry(serviceName) {
     instrumentations: [
       new ExpressInstrumentation(),
       new RedisInstrumentation(),
+      new MongoDBInstrumentation(),
     ],
   });
 
