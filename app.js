@@ -1,18 +1,21 @@
+require("dotenv").config();
+
 const configureOpenTelemetry = require("./tracing");
 
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = process.env.PORT;
 const { trace, context, propagation } = require("@opentelemetry/api");
-const tracerProvider = configureOpenTelemetry("start");
-const axios = require("axios");
+const tracerProvider = configureOpenTelemetry("events");
+// const axios = require("axios");
+const eventService = require("./eventService");
 
 app.use((req, res, next) => {
-  const tracer = tracerProvider.getTracer("express-tracer");
-  const span = tracer.startSpan("hira");
+  const tracer = tracerProvider.getTracer("open-express");
+  const span = tracer.startSpan("get");
 
   // Add custom attributes or log additional information if needed
-  span.setAttribute("user", "user made");
+  // span.setAttribute("user", "user made");
 
   // Pass the span to the request object for use in the route handler
   context.with(trace.setSpan(context.active(), span), () => {
@@ -20,43 +23,45 @@ app.use((req, res, next) => {
   });
 });
 
-app.get("/getuser", async (req, res) => {
+app.get("/events", async (req, res) => {
   // Access the parent span from the request's context
   const parentSpan = trace.getSpan(context.active());
 
   try {
     // Simulate some processing
-    const user = {
-      id: 1,
-      name: "John Doe",
-      email: "john.doe@example.com",
-    };
+    // const user = {
+    //   id: 1,
+    //   name: "John Doe",
+    //   email: "john.doe@example.com",
+    // };
 
-    if (parentSpan) {
-      parentSpan.setAttribute("user.id", user.id);
-      parentSpan.setAttribute("user.name", user.name);
-    }
+    // if (parentSpan) {
+    //   parentSpan.setAttribute("user.id", user.id);
+    //   parentSpan.setAttribute("user.name", user.name);
+    // }
 
     // Call the /validateuser endpoint on apptwo before sending the user data
     // Ensure the context is propagated with the outgoing request
-    const validateResponse = await context.with(
-      trace.setSpan(context.active(), parentSpan),
-      async () => {
-        // Prepare headers for context injection
-        const carrier = {};
-        propagation.inject(context.active(), carrier);
+    // const validateResponse = await context.with(
+    //   trace.setSpan(context.active(), parentSpan),
+    //   async () => {
+    //     // Prepare headers for context injection
+    //     const carrier = {};
+    //     propagation.inject(context.active(), carrier);
 
-        // Make the HTTP request with the injected context in headers
-        return axios.get("http://localhost:5000/validateuser", {
-          headers: carrier,
-        });
-      }
-    );
+    //     // Make the HTTP request with the injected context in headers
+    //     return axios.get("http://localhost:5000/validateuser", {
+    //       headers: carrier,
+    //     });
+    //   }
+    // );
 
-    console.log("Validation response:", validateResponse.data); // Log or use the response as needed
+    // console.log("Validation response:", validateResponse.data); // Log or use the response as needed
+
+    const getEvents = await eventService.getEvents();
 
     // Send the user data as a JSON response
-    res.json(user);
+    res.json(getEvents);
   } catch (error) {
     if (parentSpan) {
       parentSpan.recordException(error);
