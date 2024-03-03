@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const EventModel = require("./eventModel");
-const cacheService = require("./cacheService2");
+const cacheService = require("./cacheService");
 
 // Connection URL
 const url = process.env.MONGO_URL_WDB; // Replace with your MongoDB connection string

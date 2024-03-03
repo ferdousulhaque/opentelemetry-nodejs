@@ -28,36 +28,6 @@ app.get("/events", async (req, res) => {
   const parentSpan = trace.getSpan(context.active());
 
   try {
-    // Simulate some processing
-    // const user = {
-    //   id: 1,
-    //   name: "John Doe",
-    //   email: "john.doe@example.com",
-    // };
-
-    // if (parentSpan) {
-    //   parentSpan.setAttribute("user.id", user.id);
-    //   parentSpan.setAttribute("user.name", user.name);
-    // }
-
-    // Call the /validateuser endpoint on apptwo before sending the user data
-    // Ensure the context is propagated with the outgoing request
-    // const validateResponse = await context.with(
-    //   trace.setSpan(context.active(), parentSpan),
-    //   async () => {
-    //     // Prepare headers for context injection
-    //     const carrier = {};
-    //     propagation.inject(context.active(), carrier);
-
-    //     // Make the HTTP request with the injected context in headers
-    //     return axios.get("http://localhost:5000/validateuser", {
-    //       headers: carrier,
-    //     });
-    //   }
-    // );
-
-    // console.log("Validation response:", validateResponse.data); // Log or use the response as needed
-
     const getEvents = await eventService.getEvents();
 
     // Send the user data as a JSON response
@@ -85,11 +55,12 @@ const server = app.listen(port, () => {
 const gracefulShutdown = () => {
   server.close(() => {
     console.log("Server stopped");
-    sdk
-      .shutdown()
-      .then(() => console.log("Tracing terminated"))
-      .catch((error) => console.error("Error shutting down tracing", error))
-      .finally(() => process.exit(0));
+    parentSpan.end();
+    // sdk
+    //   .shutdown()
+    //   .then(() => console.log("Tracing terminated"))
+    //   .catch((error) => console.error("Error shutting down tracing", error))
+    //   .finally(() => process.exit(0));
   });
 };
 

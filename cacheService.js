@@ -1,38 +1,60 @@
-const redis = require("redis");
+const Redis = require('ioredis');
 
-// Specify your Redis server configurations
-const redisConfig = {
-  host: "localhost", // Replace with your Redis server host
-  port: 6379, // Replace with your Redis server port
-  password: "", // Replace with your Redis server password if applicable
-  // Add other configuration options as needed
+// Replace the following with your actual Redis server details
+const redisOptions = {
+    host: 'localhost',      // Redis server host
+    port: 6379,             // Redis server port
+    password: '', // Redis server password (if applicable)
+    db: 0,                  // Redis database index
+    // Add other options as needed
 };
 
-const redisClient = redis.createClient(redisConfig);
+// Example Redis operation
+async function putKey(key, value) {   
+    // Create the Redis client with the specified configuration
+    const redis = new Redis(redisOptions); 
+    try {
+        
 
-(async () => {
-  redisClient.on("error", (err) => {
-    console.log("Redis Client Error", err);
-  });
-  redisClient.on("ready", () => console.log("Redis is ready"));
+        // Your Redis operation here
+        await redis.set(key, value);
 
-  await redisClient.connect();
+        // Continue with other operations if needed
+        // ...
 
-  await redisClient.ping();
-})();
-
-// Function to put a key-value pair in Redis
-async function putKey(key, value) {
-    await redisClient.set(key, value);
+        console.log('Redis operation successful');
+    } catch (error) {
+        console.error('Redis operation failed:', error.message);
+    } finally {
+        // Close the Redis connection in a finally block to ensure it's always closed
+        if (redis) {
+            await redis.quit();
+        }
+    }
 }
 
-// Function to get a value by key from Redis
+// Example Redis operation
 async function getKey(key) {
-    return  await redisClient.get(key);
-}
+    // Create the Redis client with the specified configuration
+    const redis = new Redis(redisOptions);
+    try {
+        
+        console.log('Redis operation successful');
 
-// Export the functions for use in other modules
+        // Your Redis operation here
+        return await redis.get(key);
+        
+    } catch (error) {
+        console.error('Redis operation failed:', error.message);
+    } finally {
+        // Close the Redis connection in a finally block to ensure it's always closed
+        if (redis) {
+            await redis.quit();
+        }
+    }
+  }
+
 module.exports = {
-  putKey,
-  getKey,
-};
+    putKey,
+    getKey
+}
