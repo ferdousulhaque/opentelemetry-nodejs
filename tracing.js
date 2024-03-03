@@ -13,7 +13,13 @@ const {
 // Redis Instrumentation
 const {
   RedisInstrumentation,
-} = require("@opentelemetry/instrumentation-redis");
+} = require("@opentelemetry/instrumentation-redis-4");
+
+// const redisInstrumentation = new RedisInstrumentation({
+//   dbStatementSerializer: function (cmdName, cmdArgs) {
+//     return [cmdName, ...cmdArgs].join(" ");
+//   },
+// });
 
 // MongoDB Instrumentation
 const {

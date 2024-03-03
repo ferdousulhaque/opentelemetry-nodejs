@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 
 const EventModel = require("./eventModel");
-const cacheService = require("./cacheService");
+const cacheService = require("./cacheService2");
 
 // Connection URL
 const url = process.env.MONGO_URL_WDB; // Replace with your MongoDB connection string
@@ -24,7 +24,7 @@ async function getEvents() {
     // Read
     let events;
     let available_cache = await cacheService.getKey("events");
-    console.log(available_cache);
+    // console.log(available_cache);
     if(available_cache == null){
         events = await EventModel.find();
         cacheService.putKey("events", JSON.stringify(events));
