@@ -15,6 +15,8 @@ docker run -d --name jaeger -e COLLECTOR_ZIPKIN_HOST_PORT=:9411 -p 5775:5775/udp
 
 ## API Endpoints
 
+- Events API `/seed`
+
 - Events API `/events`
 
 ## How it works
@@ -30,6 +32,20 @@ Events API is a combination of mongodb and redis calls. Here I have used the Rea
 
 - First API Call Stack
 
+    Here you can see that 4 spans (~58ms)
+
+    - Parent API Span
+    - Redis Get Span
+    - Mongo Find Span
+    - Redis Set Span
+
+![Second API Call Stack](https://github.com/ferdousulhaque/opentelemetry-nodejs/raw/master/snapshots/Span%20without%20Cache.jpeg "First API Call Stack")
 
 - Subsequent API Call Stack
 
+    Here you can see that 2 spans only (~8ms)
+
+    - Parent API Span
+    - Redis Get Span
+
+![First API Call Stack](https://github.com/ferdousulhaque/opentelemetry-nodejs/raw/master/snapshots/Span%20with%20Cache.png "First API Call Stack")
