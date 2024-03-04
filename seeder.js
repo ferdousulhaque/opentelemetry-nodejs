@@ -69,4 +69,6 @@ function seedEvents() {
   return events;
 }
 
-seedEvents();
+module.exports = {
+  seedEvents
+}

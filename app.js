@@ -9,6 +9,7 @@ const { trace, context, propagation } = require("@opentelemetry/api");
 const tracerProvider = configureOpenTelemetry("events");
 // const axios = require("axios");
 const eventService = require("./eventService");
+const seed = require("./seeder");
 
 app.use((req, res, next) => {
   const tracer = tracerProvider.getTracer("open-express");
@@ -21,6 +22,29 @@ app.use((req, res, next) => {
   context.with(trace.setSpan(context.active(), span), () => {
     next();
   });
+});
+
+app.get("/seed", async (req, res) => {
+  // Access the parent span from the request's context
+  const parentSpan = trace.getSpan(context.active());
+
+  try {
+    seed.seedEvents();
+
+    // Send the user data as a JSON response
+    res.json({action: "Data Seeded"});
+  } catch (error) {
+    if (parentSpan) {
+      parentSpan.recordException(error);
+    }
+    res.status(500).send(error.message);
+  } finally {
+    // End the span if it was manually created
+    // Note: If the span was created by OpenTelemetry's HTTP instrumentation, it might be automatically ended
+    if (typeof parentSpan !== 'undefined') {
+      parentSpan.end();
+    }
+  }
 });
 
 app.get("/events", async (req, res) => {
