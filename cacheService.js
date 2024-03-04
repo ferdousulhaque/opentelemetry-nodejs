@@ -1,6 +1,7 @@
 const Redis = require('ioredis');
 const configureOpenTelemetry = require("./tracing");
 const tracerProvider = configureOpenTelemetry("redis");
+const tracer = tracerProvider.getTracer("open-express");
 
 require("dotenv").config();
 
@@ -13,13 +14,16 @@ const redisOptions = {
 
 async function set(key, value) {   
     const redis = new Redis(redisOptions); 
-    const tracer = tracerProvider.getTracer("open-express");
     const span = tracer.startSpan("redis-set");
 
     try {
         await redis.set(key, value);
+        console.log(`Key set: ${key}`);
+        span.addEvent('Key set successfully');
     } catch (error) {
-        console.error('Redis operation failed:', error.message);
+        console.error(`Error setting key ${key}:`, error);
+        span.recordException(error);
+        span.setStatus({ code: trace.SpanStatusCode.ERROR, message: error.message });
     } finally {
         // Close the Redis connection in a finally block to ensure it's always closed
         if (redis) {
@@ -32,14 +36,18 @@ async function set(key, value) {
 
 async function get(key) {
     const redis = new Redis(redisOptions);
-    const tracer = tracerProvider.getTracer("open-express");
     const span = tracer.startSpan("redis-get");
 
     try {
-        return await redis.get(key);
+        const value = await redis.get(key);
+        console.log(`Value for ${key}:`, value);
+        span.addEvent('Value retrieved successfully');
+        return value;
         
     } catch (error) {
-        console.error('Redis operation failed:', error.message);
+        console.error(`Error getting value for key ${key}:`, error);
+        span.recordException(error);
+        span.setStatus({ code: trace.SpanStatusCode.ERROR, message: error.message });
     } finally {
         // Close the Redis connection in a finally block to ensure it's always closed
         if (redis) {

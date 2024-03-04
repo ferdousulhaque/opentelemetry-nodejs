@@ -40,7 +40,7 @@ app.get("/events", async (req, res) => {
   } finally {
     // End the span if it was manually created
     // Note: If the span was created by OpenTelemetry's HTTP instrumentation, it might be automatically ended
-    if (parentSpan) {
+    if (typeof parentSpan !== 'undefined') {
       parentSpan.end();
     }
   }
@@ -54,8 +54,9 @@ const server = app.listen(port, () => {
 // Gracefully shut down the OpenTelemetry SDK and the server
 const gracefulShutdown = () => {
   server.close(() => {
-    console.log("Server stopped");
-    parentSpan.end();
+    if (typeof parentSpan !== 'undefined') {
+      parentSpan.end();
+    }
     // sdk
     //   .shutdown()
     //   .then(() => console.log("Tracing terminated"))
