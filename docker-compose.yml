@@ -10,7 +10,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: admin
   cache:
-      container_name: cfl_cache
+      container_name: cache
       image: redis:7.2.4-alpine
       ports:
           - '6379:6379'

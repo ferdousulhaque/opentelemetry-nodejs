@@ -1,28 +1,23 @@
 const Redis = require('ioredis');
+const configureOpenTelemetry = require("./tracing");
+const tracerProvider = configureOpenTelemetry("redis");
 
-// Replace the following with your actual Redis server details
+require("dotenv").config();
+
 const redisOptions = {
-    host: 'localhost',      // Redis server host
-    port: 6379,             // Redis server port
-    password: '', // Redis server password (if applicable)
-    db: 0,                  // Redis database index
-    // Add other options as needed
+    host: process.env.REDIS_HOST,                       // Redis server host
+    port: parseInt(process.env.REDIS_PORT),             // Redis server port
+    password: process.env.REDIS_PASS,             // Redis server password (if applicable)
+    db: parseInt(process.env.REDIS_DB||0),                 // Redis database index
 };
 
-// Example Redis operation
-async function putKey(key, value) {   
-    // Create the Redis client with the specified configuration
+async function set(key, value) {   
     const redis = new Redis(redisOptions); 
+    const tracer = tracerProvider.getTracer("open-express");
+    const span = tracer.startSpan("redis-set");
+
     try {
-        
-
-        // Your Redis operation here
         await redis.set(key, value);
-
-        // Continue with other operations if needed
-        // ...
-
-        console.log('Redis operation successful');
     } catch (error) {
         console.error('Redis operation failed:', error.message);
     } finally {
@@ -30,18 +25,17 @@ async function putKey(key, value) {
         if (redis) {
             await redis.quit();
         }
+        span.end();
     }
 }
 
-// Example Redis operation
-async function getKey(key) {
-    // Create the Redis client with the specified configuration
-    const redis = new Redis(redisOptions);
-    try {
-        
-        console.log('Redis operation successful');
 
-        // Your Redis operation here
+async function get(key) {
+    const redis = new Redis(redisOptions);
+    const tracer = tracerProvider.getTracer("open-express");
+    const span = tracer.startSpan("redis-get");
+
+    try {
         return await redis.get(key);
         
     } catch (error) {
@@ -51,10 +45,11 @@ async function getKey(key) {
         if (redis) {
             await redis.quit();
         }
+        span.end();
     }
   }
 
 module.exports = {
-    putKey,
-    getKey
+    set,
+    get
 }

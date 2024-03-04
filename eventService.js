@@ -23,11 +23,11 @@ db.once("open", () => {
 async function getEvents() {
     // Read
     let events;
-    let available_cache = await cacheService.getKey("events");
+    let available_cache = await cacheService.get("events");
     // console.log(available_cache);
     if(available_cache == null){
         events = await EventModel.find();
-        cacheService.putKey("events", JSON.stringify(events));
+        cacheService.set("events", JSON.stringify(events));
         events = {
             cached: 0,
             events

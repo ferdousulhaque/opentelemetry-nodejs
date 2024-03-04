@@ -28,7 +28,7 @@ app.get("/events", async (req, res) => {
   const parentSpan = trace.getSpan(context.active());
 
   try {
-    const getEvents = await eventService.getEvents();
+    const getEvents = await eventService.getEvents(parentSpan);
 
     // Send the user data as a JSON response
     res.json(getEvents);
